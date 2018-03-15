@@ -1,6 +1,8 @@
 package com.yzf14.mvpdemo;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,7 +10,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements MvpView{
+import com.yzf14.mvpdemo.base.BaseActivity;
+import com.yzf14.mvpdemo.base.BaseView;
+
+public class MainActivity extends BaseActivity implements MvpView {
 
     ProgressDialog progressBarDialog;
     TextView textView;
@@ -24,7 +29,15 @@ public class MainActivity extends AppCompatActivity implements MvpView{
         progressBarDialog.setCancelable(false);
         progressBarDialog.setMessage("正在加载数据");
 
-        presenter = new MvpPresenter(this);
+        presenter = new MvpPresenter();
+
+        presenter.attachView(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.detachView();
     }
 
     public void getData(View view) {
@@ -50,18 +63,24 @@ public class MainActivity extends AppCompatActivity implements MvpView{
             progressBarDialog.dismiss();
         }
     }
+
+    @Override
+    public void showToast(String msg) {
+
+    }
+
+    @Override
+    public void showErr() {
+
+    }
+
+    @Override
+    public Context getContext() {
+        return null;
+    }
+
     @Override
     public void showData(String data) {
         textView.setText(data);
-    }
-    @Override
-    public void showFailureMessage(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        textView.setText(msg);
-    }
-    @Override
-    public void showErrorMessage() {
-        Toast.makeText(this, "网络请求数据出现异常", Toast.LENGTH_SHORT).show();
-        textView.setText("网络请求数据出现异常");
     }
 }
